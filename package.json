@@ -1,0 +1,28 @@
+{
+  "name": "sfcc-properties-tools",
+  "version": "1.0.0",
+  "description": "A simple CLI toolset to work with *.properties files in Salesforce Commerce Cloud B2C projects",
+  "main": "index.js",
+  "bin": {
+    "sfcc-props": "./cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "author": "Jonathan Lammens",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^20.9.4",
+    "adm-zip": "^0.5.10",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "fast-glob": "^3.3.2",
+    "spinnies": "^0.5.1"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.5",
+    "typescript": "^5.3.2"
+  }
+}
