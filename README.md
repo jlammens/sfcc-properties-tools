@@ -3,7 +3,7 @@
 A small toolset specifically designed for working with  `.properties` files in Salesforce Commerce Cloud B2C projects.
 
 > [!WARNING]
-> This project is still very musch Work In Progress !
+> This project is still very much Work In Progress !
 
 ## Features ##
 
@@ -13,7 +13,7 @@ A small toolset specifically designed for working with  `.properties` files in S
 ## Installation ##
 
 > [!WARNING]
-> npm module not available yet: if you wish to use, clone the repo and run `npm run build`, then `npm link` to register it
+> npm module not available yet: if you wish to use, clone the repo and execute `npm run build`, then `npm link` to add it to your NPM registry
 
 Install globally via `npm` to use the CLI via the `sfcc-props` command
 ```
