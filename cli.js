@@ -30,6 +30,19 @@ program
     .description(pkg.description)
     .version(pkg.version);
 
+/*
+TODO other useful commands :
+
+ensure <locale> --from <locales...> : ensure all resource keys exist in the given locale, using values 
+from the given locale(s) as needed. This is especially useful in heterogenous team where developers do 
+not share the same coding practice
+
+audit --ignore <bundles...> : look for missing translations, i.e. resource keys used in the codebase without 
+any correspondance in properties files ("ignore" option is useful when Resource Manager is used). Also looks for 
+properties which are not found in the code (Note : will yield false positives if resource keys are built dynamically)
+
+*/
+
 program.command('export')
     .summary('Exports resource bundles from one or more cartridges into one or more tabular files')
     .description('Extracts all the resource bundles from the given cartridge(s) into a zipped package of one or more CSV file(s). Each CSV file \

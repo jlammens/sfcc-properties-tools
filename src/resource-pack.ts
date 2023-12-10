@@ -8,8 +8,7 @@ import { Bundle } from './bundle';
 import { Cartridge, type CartridgeSummary } from './cartridge';
 import { Properties } from './properties'
 import { type Property } from './properties/property';
-import { type CSVExportOptions, CSVImportOptions, ImportOptions } from './io';
-import { CsvExporter, CsvParser } from './io/csv';
+import { type CSVExportOptions, type CSVImportOptions, type ImportOptions, CsvExporter, CsvParser, JsonExporter, ExportOptions, JsonExportOptions } from './io';
 import { SharedEmitter } from './emitter';
 
 interface CartridgeMap {
@@ -111,6 +110,25 @@ export class ResourcePack {
 
         return pack;
     }
+
+    /* TODO 
+    static async fromJson(path : string, options : any) : Promise<ResourcePack> {
+        
+        const emitter = SharedEmitter.getInstance();
+
+        emitter.emit('unpack:start');
+
+        var content = require(path);
+
+        var parser = new JsonParser(options);
+        
+        var pack = await parser.parse(content);
+    
+        emitter.emit('unpack:complete');
+
+        return pack;
+    }
+    */
 
     /**
      * Registers a new event listener. This gives access to any event emitted during the 
@@ -236,6 +254,17 @@ export class ResourcePack {
         this.emitter.emit('export:start');
 
         var result = new CsvExporter(options).export(this);
+
+        this.emitter.emit('export:complete');
+
+        return result;
+    }
+
+    public toJson(options : JsonExportOptions) : Object {
+
+        this.emitter.emit('export:start');
+
+        var result = new JsonExporter(options).export(this);
 
         this.emitter.emit('export:complete');
 

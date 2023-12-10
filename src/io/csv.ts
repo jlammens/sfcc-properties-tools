@@ -4,7 +4,7 @@ import Zip from 'adm-zip';
 import { glob } from 'fast-glob';
 import parseCSV from 'csv-parser';
 
-import type { CSVExportOptions, CSVParseOptions, Exporter, Parser } from ".";
+import { type ExportOptions, Exporter, type Parser, type ImportOptions } from "./common";
 import { ResourcePack } from '../resource-pack';
 import { Bundle } from '../bundle';
 import { BundleEntry } from '../bundle-entry';
@@ -13,13 +13,29 @@ import { SharedEmitter } from '../emitter';
 
 const DEFAULT_KEY_HEADER = 'Resource key';
 
+
+
+interface CsvFileOptions {
+    fieldSeparator : string,
+    escapeCharacter : string,
+    quoteCharacter : string,
+    eolCharacter : string
+}
+
+export type CSVExportOptions = ExportOptions & CsvFileOptions;
+export type CSVParseOptions = CsvFileOptions & {
+    encoding : BufferEncoding,
+    baseDirectory : string
+};
+export type CSVImportOptions = ImportOptions & CSVParseOptions;
+
 /**
  * A `CsvExporter` provides methods to export the content of a resource pack into a 
  * zipped archive of CSV files. The archive has a folder for each cartridge, and each
  * folder contains one or more CSV files, each representing a single resource bundle.
  * Inside the CSV, each row represents a single resource and each column is a locale
  */
-export class CsvExporter implements Exporter<Zip> {
+export class CsvExporter extends Exporter<Zip> {
 
     private filename : string;
     private separator : string;
@@ -27,22 +43,17 @@ export class CsvExporter implements Exporter<Zip> {
     private escape : string;
     private eol : string;
 
-    private excludeIfAll : string[] = []
-
     /**
      * Instanciates a new `CsvExporter` with the provided options
      * @param options 
      */
     constructor(options : CSVExportOptions) {
+        super(options)
         this.filename = options.outFile;
         this.separator = options.fieldSeparator;
         this.quote = options.quoteCharacter;
         this.escape = options.escapeCharacter;
         this.eol = options.eolCharacter;
-
-        if (options.ifNotLocales) {
-            this.excludeIfAll = options.ifNotLocales;
-        }
     }
 
     /**
@@ -89,22 +100,6 @@ export class CsvExporter implements Exporter<Zip> {
         }
 
         return lines;
-    }
-
-    /**
-     * Determines whether a given `BundleEntry` should be included in the exported
-     * package based on the current options
-     * @param entry 
-     * @returns 
-     */
-    private shouldInclude(entry : BundleEntry) : boolean {
-        let include = true;
-
-        // Other filtering options may be checked here in the future
-        if(this.excludeIfAll.length > 0) {
-            include = !entry.hasAllLocales(this.excludeIfAll)
-        }
-        return include;
     }
 
     /**
@@ -180,7 +175,7 @@ export class CsvParser implements Parser<Zip> {
             parts = zipEntry.entryName.match(/.+\/(.+)\/(.+).csv/)
             
             if(parts == null || parts.length !== 3) {
-                this.emitter.emit('csv:invalidEntry', { entry: zipEntry.entryName });
+                this.emitter.emit('unpack:invalidEntry', { entry: zipEntry.entryName });
                 continue;
             }
 
@@ -197,12 +192,12 @@ export class CsvParser implements Parser<Zip> {
                 var paths = await glob(this.baseDir + '/**/' + cartridgeName + '/cartridge', { onlyFiles: false, objectMode: false })
 
                 if(paths.length == 0) {
-                    this.emitter.emit('csv:unknownCartridge', { cartridge: cartridgeName, directory: this.baseDir });
+                    this.emitter.emit('unpack:unknownCartridge', { cartridge: cartridgeName, directory: this.baseDir });
                     invalidCartridges.push(cartridgeName);
                     continue;
                 } else if(paths.length > 1) {
                     // TODO create an option to solve ambiguity, such as a regex that the path must / must not match
-                    this.emitter.emit('csv:ambiguousCartridge', { cartridge: cartridgeName, directory: this.baseDir, matches: paths });
+                    this.emitter.emit('unpack:ambiguousCartridge', { cartridge: cartridgeName, directory: this.baseDir, matches: paths });
                     invalidCartridges.push(cartridgeName);
                     continue;
                 }
@@ -210,13 +205,13 @@ export class CsvParser implements Parser<Zip> {
                 cartridge = pack.createCartridge(cartridgeName, paths[0]);
             }
             
-            this.emitter.emit('csv:beforeParseEntry', { entry: zipEntry.entryName, cartridge: cartridgeName, bundle: bundleName });
+            this.emitter.emit('unpack:beforeParseEntry', { entry: zipEntry.entryName, cartridge: cartridgeName, bundle: bundleName });
 
             bundleName = parts[2].trim();
             const bundle = await this.toBundle(bundleName, zipEntry.getData(), zipEntry.entryName);
             cartridge.addBundle(bundle);
 
-            this.emitter.emit('csv:afterParseEntry', { entry: zipEntry.entryName, cartridge: cartridgeName, bundle: bundleName, resourceCount : bundle.getEntryCount() });
+            this.emitter.emit('unpack:afterParseEntry', { entry: zipEntry.entryName, cartridge: cartridgeName, bundle: bundleName, resourceCount : bundle.getEntryCount() });
         }
 
         return pack;
@@ -240,7 +235,7 @@ export class CsvParser implements Parser<Zip> {
                     if (isValidLocale(headerValue)) {
                         locales.push(headerValue);
                     } else {
-                        this.emitter.emit('csv:invalidLocale', { locale : headerValue, entrey: entryName });
+                        this.emitter.emit('unpack:invalidLocale', { locale : headerValue, entry: entryName });
                     }
                 });
             })
