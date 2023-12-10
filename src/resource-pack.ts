@@ -77,9 +77,12 @@ export class ResourcePack {
      * @param paths a path (either absolute or relative, or a glob pattern), or a list thereof. 
      * @returns a promise that resolves with a `ResourcePack` of all the `.properties`
      */
-    static async fromCartridges(paths : string|string[]): Promise<ResourcePack> {
-
-        if (!Array.isArray(paths)) paths = [paths];
+    static async fromCartridges(paths ?: string|string[]): Promise<ResourcePack> {
+        if(!paths) {
+            paths = [process.cwd()];
+        } else if (!Array.isArray(paths)) {
+            paths = [paths];
+        }
 
         var propFiles = await glob(
             paths.map(path => path + '/**/templates/resources/*.properties'), 

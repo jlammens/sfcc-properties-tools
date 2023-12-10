@@ -59,7 +59,7 @@ corresponds to a single cartridge/bundle combination, with one resource per line
 
         var filename = options.outfile || 'properties_' + Date.now();
 
-        let { ResourcePack } = require('./lib/resource-pack.js');   
+        let { ResourcePack } = require('.');   
         
         ResourcePack.on('pack:start', () => { 
             spinners.add('packStart', {

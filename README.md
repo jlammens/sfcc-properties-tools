@@ -66,11 +66,14 @@ npm install --save sfcc-properties-tools
 
 ## Javascript API ##
 
-In addition to the CLI, `sfcc-properties-tools` is also usable as a NodeJS library. The main export is a `ResourcePack` class which exposes all the required methods to interact with properties bundles the same way you would with the CLI.
+The main export is a `ResourcePack` class which exposes all the required methods to interact with properties bundles the same way you would with the CLI, with additional capabilities.
 The module provides type definitions and is fully documented, so check your IDE for a detailed list of method and options.
 
 ```javascript
-import { ResourcePack } from 'sfcc-properties-tools'
+import { ResourcePack } from 'sfcc-properties-tools';
+
+// packs all .properties files found in the current folder hierarchy
+var pack = ResourcePack.fromCartridges();
 ```
 
 ### Events ###
