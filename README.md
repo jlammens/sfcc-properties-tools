@@ -41,9 +41,6 @@ action.edit.step;"Edit";"Modifier";"編集"
 
 ## Installation ##
 
-> [!WARNING]
-> npm module not available yet: if you wish to use, clone the repo and execute `npm run build`, then `npm link` to add it to your NPM registry
-
 Install globally via `npm` to use the CLI via the `sfcc-props` command
 ```
 npm install -g sfcc-properties-tools
@@ -77,7 +74,7 @@ var pack = ResourcePack.fromCartridges();
 ```
 
 ### Events ###
-You can attach event listeners to the `ResourcePack` class (or instance thereof, depending on your need), to be notified of progress and/or errors encountered during a process. 
+You can attach event listeners to the `ResourcePack` class, to be notified of progress and/or errors encountered during a process. 
 
 
 #### Pack events ####

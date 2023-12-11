@@ -1,6 +1,6 @@
 {
   "name": "sfcc-properties-tools",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "description": "A simple CLI toolset to work with .properties files in Salesforce Commerce Cloud B2C projects",
   "main": "index.js",
   "bin": {

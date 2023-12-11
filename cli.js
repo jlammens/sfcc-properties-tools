@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 
 
+const { writeFileSync } = require('fs');
 const { EOL } = require('os')
 
 const { Command, Argument } = require('commander');
@@ -47,15 +48,15 @@ program.command('export')
     .summary('Exports resource bundles from one or more cartridges into one or more tabular files')
     .description('Extracts all the resource bundles from the given cartridge(s) into a zipped package of one or more CSV file(s). Each CSV file \
 corresponds to a single cartridge/bundle combination, with one resource per line and a dedicated column for each existing locale translation.')
-    .addArgument(new Argument('[format]', 'The target file format.').choices(['csv']).default('csv'))
+    .addArgument(new Argument('[format]', 'The target file format.').choices(['csv', 'json']).default('csv'))
     .argument('[cartridges...]', 'The cartridge(s) to extract resources from. Supports both explicit paths and glob patterns.', './**/cartridge')
     .option('-o, --outfile <filename>', 'name of the resulting package, without extension (defaults to a system-generated unique name)')
     .option('-s, --separator <character>', 'separator character for the CSV fields', ';')
     .option('-q, --quotation <character>', 'character used to enclose special strings, i.e. strings which contains the field separator or a line break', '"')
     .option('-e, --escape <character>', 'character used to escape the quotation character when it is found inside a string', '"')
     .option('-l, --eol <character>', 'character(s) used for end of lines in the resulting CSV files', EOL)
-    .option('--if-not <locales...>', 'only extract resource keys which have an empty value for AT LEAST ONE of the given locale(s)', asArray, [])
-    .action(async (cartridges, options) => {
+    .option('--if-missing <locales...>', 'only extract resource keys which have an empty value for AT LEAST ONE of the given locale(s)', asArray, [])
+    .action(async (format, cartridges, options) => {
 
         var filename = options.outfile || 'properties_' + Date.now();
 
@@ -80,17 +81,30 @@ corresponds to a single cartridge/bundle combination, with one resource per line
 
         var pack = await ResourcePack.fromCartridges(cartridges);
         
-        var result = pack.toCsvPack({
-            outFile: filename,
-            fieldSeparator: options.separator,
-            escapeCharacter: options.escape,
-            quoteCharacter: options.quotation,
-            eolCharacter: options.eol,
-            ifNotLocales: options.ifNot
-        })
-        
-        result.writeZip(filename + '.zip');
+        if(format == 'csv') {
+            var result = pack.toCsvPack({
+                outFile: filename,
+                fieldSeparator: options.separator,
+                escapeCharacter: options.escape,
+                quoteCharacter: options.quotation,
+                eolCharacter: options.eol,
+                ifNotLocales: options.ifMissing
+            })
+            
+            result.writeZip(filename + '.zip');
+        } else if(format == 'json') {
+            var result = pack.toJson({
+                outFile: filename,
+                ifNotLocales: options.ifMissing
+            })
+            try {
+                writeFileSync(filename + '.json', JSON.stringify(result, null, 2));
+              } catch (err) {
+                console.error(err);
+              }
+        }
     });
+
 
 program.command('import')
     .summary('Creates and/or updates `.properties` files in bulk from a given package')

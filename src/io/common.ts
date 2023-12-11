@@ -17,6 +17,7 @@ export interface ImportOptions {
 
 export abstract class Exporter<T> {
 
+    // all options which influence the outcome of shouldInclude must be defined here
     protected excludeIfAll : string[] = []
 
     constructor(options : ExportOptions) {
@@ -28,7 +29,7 @@ export abstract class Exporter<T> {
 
     /**
      * Determines whether a given `BundleEntry` should be included in the exported
-     * package based on the current options
+     * package based on the current export options
      * @param entry 
      * @returns 
      */
@@ -42,6 +43,10 @@ export abstract class Exporter<T> {
         return include;
     }
 
+    /**
+     * Exports (converts) the given `ResourcePack` to the expected format
+     * @param pack the `ResourcePack` to export
+     */
     abstract export(pack : ResourcePack) : T|Promise<T>;
 }
 
