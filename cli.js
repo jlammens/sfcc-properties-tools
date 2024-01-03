@@ -62,26 +62,36 @@ corresponds to a single cartridge/bundle combination, with one resource per line
 
         let { ResourcePack } = require('.');   
         
-        ResourcePack.on('pack:start', () => { 
-            spinners.add('packStart', {
-                text: 'Extraction...',
+        var total;
+        ResourcePack.on('pack:start', ({ fileCount }) => { 
+            total = fileCount;
+            spinners.add('pack', {
+                text: `Extracting .properties files...`,
                 succeedColor: 'white'
             })
-        }).on('pack:beforeFile', ({ filePath, cartridge, bundle, locale }) => { 
-            spinners.add(filePath, {
-                text: 'Extracting resources from ' + chalk.blue(cartridge + ' > ' + bundle + ' [' + locale + ']'),
-                succeedColor: 'white',
-                indent: 2
+        }).on('pack:afterFile', ({ cartridge, bundle, locale, fileIndex }) => { 
+            spinners.update('pack', {
+                text: `Extracting .properties files ${fileIndex} of ${total} : ${chalk.blue(cartridge + ' > ' + bundle + ' > ' + locale)}...`,
             })
-        }).on('pack:afterFile', ({ filePath }) => { 
-            spinners.succeed(filePath)
         }).on('pack:complete', () => { 
-            spinners.succeed('packStart')
+            spinners.succeed('pack', {
+                text: `Successfully extracted ${total} .properties file(s)`
+            })
+        }).on('export:start', () => { 
+            spinners.add('export', {
+                text: `Exporting to ${format.toUpperCase()}...`,
+                succeedColor: 'white'
+            })
+        }).on('export:complete', ({ resources }) => { 
+            spinners.succeed('export', {
+                text: `Successfully exported ${resources} resources to ${format.toUpperCase()}`
+            })
         });
 
         var pack = await ResourcePack.fromCartridges(cartridges);
         
         if(format == 'csv') {
+
             var result = pack.toCsvPack({
                 outFile: filename,
                 fieldSeparator: options.separator,
@@ -92,6 +102,7 @@ corresponds to a single cartridge/bundle combination, with one resource per line
             })
             
             result.writeZip(filename + '.zip');
+
         } else if(format == 'json') {
             var result = pack.toJson({
                 outFile: filename,
@@ -99,9 +110,9 @@ corresponds to a single cartridge/bundle combination, with one resource per line
             })
             try {
                 writeFileSync(filename + '.json', JSON.stringify(result, null, 2));
-              } catch (err) {
+            } catch (err) {
                 console.error(err);
-              }
+            }
         }
     });
 
