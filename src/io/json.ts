@@ -16,19 +16,17 @@ export class JsonExporter extends Exporter<Object> {
         pack.getCartridges().forEach(cartridge => {
             cartridge.getBundles().forEach(bundle => {
                 bundle.getEntries()
-                //.filter(this.shouldInclude)
+                .filter(entry => this.shouldInclude(entry) )
                 .forEach(entry => {
-                    if(this.shouldInclude(entry)) {
-                        obj[cartridge.name] = obj[cartridge.name] || {};
-                        obj[cartridge.name][bundle.name] = obj[cartridge.name][bundle.name] || {};
-                        obj[cartridge.name][bundle.name][entry.key] = {}
-                        entry.getLocales().forEach(locale => {
-                            let text = entry.getTranslation(locale);
-                            if(text != null) {
-                                obj[cartridge.name][bundle.name][entry.key][locale] = text;
-                            }
-                        })
-                    }
+                    obj[cartridge.name] = obj[cartridge.name] || {};
+                    obj[cartridge.name][bundle.name] = obj[cartridge.name][bundle.name] || {};
+                    obj[cartridge.name][bundle.name][entry.key] = {}
+                    entry.getLocales().forEach(locale => {
+                        let text = entry.getTranslation(locale);
+                        if(text != null) {
+                            obj[cartridge.name][bundle.name][entry.key][locale] = text;
+                        }
+                    })
                 })
             })
         })

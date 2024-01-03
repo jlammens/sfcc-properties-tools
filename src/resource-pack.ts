@@ -269,7 +269,7 @@ export class ResourcePack {
 
         var result = new JsonExporter(options).export(this);
 
-        this.emitter.emit('export:complete');
+        this.emitter.emit('export:complete', { resources : this.getSummary().resources });
 
         return result;
     }
