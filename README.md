@@ -8,7 +8,7 @@ A small toolset specifically designed for working with  `.properties` files in S
 ## Features ##
 
 * Export/import properties bundles to/from a more human-readable format to streamline translation phases
-* more to come :-)
+* more to come 🙂
 
 ## Supported file formats for Import and Export ##
 
@@ -40,139 +40,49 @@ action.edit.step;"Edit";"Modifier";"編集"
 
 
 ## Installation ##
-
-Install globally via `npm` to use the CLI via the `sfcc-props` command
+Install via NPM :
+```
+npm install sfcc-properties-tools
+```
+You can also install globally to have the `sfcc-props` command available in your path :
 ```
 npm install -g sfcc-properties-tools
 ```
 
-In addition to the CLI, `sfcc-properties-tools` is also usable as a NodeJS library that you can include in your own projects
-```
-npm install --save sfcc-properties-tools
-```
-
 ## Commands ##
+`sfcc-properties-tools` will most often be used in CLI mode via the `sfcc-props` command (although a Javascript API is also available).
 
 > [!TIP]
-> If you use the CLI, you can run `sfcc-props --help` (or simply `sfcc-props`) to view the list of available commands and options. You can also use `sfcc-props <command> --help` for help on a specific command.
+> You can run `sfcc-props --help` (or simply `sfcc-props`) to view the list of available subcommands and options. You can also use `sfcc-props <subcommand> --help` for help on a specific subcommand.
 
 ### Export ###
 
+To be completed
 
 ### Import ###
 
+To be completed
+
 ## Javascript API ##
 
+In addition to the CLI, `sfcc-properties-tools` is usable as a NodeJS library that you can include in your own projects to build onto.
 The main export is a `ResourcePack` class which exposes all the required methods to interact with properties bundles the same way you would with the CLI, with additional capabilities.
 The module provides type definitions and is fully documented, so check your IDE for a detailed list of method and options.
 
+### Example ###
 ```javascript
 import { ResourcePack } from 'sfcc-properties-tools';
 
 // packs all .properties files found in the current folder hierarchy
-var pack = ResourcePack.fromCartridges();
+var pack = await ResourcePack.fromCartridges();
 ```
 
 ### Events ###
 You can attach event listeners to the `ResourcePack` class, to be notified of progress and/or errors encountered during a process. 
 
+To be completed
 
-#### Pack events ####
-
-```javascript
-// when the .properties files to pack have been resolved
-ResourcePack.on('pack.start', ({ fileCount }) => {
-    // fileCount : the total number of .properties files which have been selected for packing
-});
-
-// before a .properties files is parsed and added to the pack
-ResourcePack.on('pack.beforeFile', ({ filePath, cartridge, bundle, locale, fileIndex }) => {
-    // filePath : the path of the properties file on the file system
-    // cartridge: the name of the cartridge the file belong to
-    // bundle : the name of the bundle the file is part of
-    // locale: the locale provided by the file
-    // fileIndex : the index of the file within the pack
-});
-
-// after a .properties file is added to the pack
-ResourcePack.on('pack.afterFile', ({ filePath, cartridge, bundle, locale, fileIndex, propertiesCount }) => {
-    // filePath : the path of the properties file on the file system
-    // cartridge: the name of the cartridge the file belongs to
-    // bundle : the name of the bundle the file is part of
-    // locale: the locale provided by the file
-    // fileIndex : the index of the file within the pack
-    // propertiesCount: the number of resources added to the pack
-});
-
-// when the packing process is finished
-ResourcePack.on('pack.complete', () => {});
-```
-
-#### Export events ####
-```javascript
-// when the conversion process to the target file format starts
-ResourcePack.on('export.start', () => {});
-
-// when the conversion process is finished
-ResourcePack.on('export:complete', () => {});
-```
-
-#### Unpack events ####
-
-```javascript
-// when the unpacking process starts
-ResourcePack.on('unpack.start', () => {});
-
-// when an invalid entry is found in the pack
-// e.g. when a zip archive does not have the expected structure
-ResourcePack.on('unpack:invalidEntry', ({ entry }) => {
-    // entry : the full name of the entry
-});
-
-// when the pack contains a cartridge name which does not exist in the working directory
-ResourcePack.on('unpack:unknownCartridge', ({ cartridge, directory }) => {
-    // cartridge : the name of the cartridge
-    // directory : the path of the working directory on the file system
-});
-
-// when more than one cartridge with a given name are found in the working directory
-ResourcePack.on('unpack:ambiguousCartridge', ({ cartridge, directory, matches }) => {
-    // cartridge : the name of the cartridge
-    // directory : the path of the working directory on the file system
-    // matches : an array of matching cartridge paths on the file syetem
-});
-
-// before a packed entry is parsed
-ResourcePack.on('unpack:beforeParseEntry', ({ entry, cartridge, bundle }) => {
-    // entry : the full name of the entry
-    // cartridge : the cartridge this entry belongs to
-    // bundle : the bundle this entry represents
-});
-
-// after a packed entry has been parsed
-ResourcePack.on('unpack:afterParseEntry', ({ entry, cartridge, bundle, resourceCount }) => {
-    // entry : the full name of the entry
-    // cartridge : the cartridge this entry belongs to
-    // bundle : the bundle this entry represents
-    // resourceCount : the number of individual resources found in the entry
-});
-
-// when an invalid locale is found in an entry
-ResourcePack.on('unpack:invalidLocale', ({ locale, entry }) => {
-    // locale : the invalid locale
-    // entry : the full name of the entry where the locale was found
-});
-
-// when the unpacking process is finished
-ResourcePack.on('unpack.complete', () => {});
-```
-
-#### Import events ####
-```javascript
-
-```
-
-## TODO ##
+## ToDo List ##
 - support more file formats (JSON, XLSX, XLIFF...)
 - additional commands
 - tests
